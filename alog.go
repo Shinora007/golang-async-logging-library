@@ -47,8 +47,8 @@ loop:
 	for {
 		select {
 		case msg := <-al.msgCh:
+			wg.Add(1)
 			go func(msg string, wg *sync.WaitGroup) {
-				wg.Add(1)
 				al.write(msg, wg)
 			}(msg, wg)
 		case _ = <-al.shutdownCh:
@@ -68,11 +68,12 @@ func (al Alog) formatMessage(msg string) string {
 
 func (al Alog) write(msg string, wg *sync.WaitGroup) {
 	al.m.Lock()
-
 	defer al.m.Unlock()
 	defer wg.Done()
 
-	if _, err := al.dest.Write([]byte(al.formatMessage(msg))); err != nil {
+	_, err := al.dest.Write([]byte(al.formatMessage(msg)))
+
+	if err != nil {
 		go func() {
 			al.errorCh <- err
 		}()
