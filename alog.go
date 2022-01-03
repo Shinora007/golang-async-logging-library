@@ -41,12 +41,8 @@ func New(w io.Writer) *Alog {
 // Start begins the message loop for the asynchronous logger. It should be initiated as a goroutine to prevent
 // the caller from being blocked.
 func (al Alog) Start() {
-	//for message := range al.msgCh {
-	//	go func(msg string) {
-	//		al.write(msg, nil)
-	//	}(message)
-	//}
 	wg := &sync.WaitGroup{}
+
 loop:
 	for {
 		select {
